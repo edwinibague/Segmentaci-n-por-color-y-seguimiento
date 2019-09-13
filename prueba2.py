@@ -37,10 +37,10 @@ while(1):
     upper_blue = np.array([135,255,255])
 
     # define range of red color in HSV
-    lower_red = np.array([0,180,75])
+    lower_red = np.array([0,100,45])
     upper_red = np.array([3,255,255])
 
-    lower_red_1 = np.array([177,180,75])
+    lower_red_1 = np.array([177,100,45])
     upper_red_1 = np.array([180,255,255])
 
     # define range of yellow color in HSV
@@ -73,13 +73,13 @@ while(1):
     mask_red = cv2.dilate(mask_red, None, iterations=8)
 
 	# dilate 2 times
-    mask_red = cv2.erode(mask_red, None, iterations=6)
+    mask_red = cv2.erode(mask_red, None, iterations=10)
 
 	# Erode 2 times
     mask_red_1 = cv2.erode(mask_red_1, None, iterations=8)
 
 	# dilate 2 times
-    mask_red_1 = cv2.dilate(mask_red_1, None, iterations=6)
+    mask_red_1 = cv2.dilate(mask_red_1, None, iterations=10)
 
     
     res_blue = cv2.bitwise_and(frame,frame, mask= mask_blue)
@@ -123,16 +123,21 @@ while(1):
         cv2.circle(frame, (cX, cY), 5, (255, 255, 255), -1)
         cv2.putText(frame, "centroid", (cX - 25, cY - 25),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         #print ("cX=",cX)
-        """
+        
         if cX <= limite-10:# and cX >= limite+10:
-            print ("estoy en el limite")
-            if res_red[cX][cY] != 0:
+            value_blue=res_blue[cX,cY]
+            value_red=res_red[cX,cY]
+            value_yellow=res_yellow[cX,cY]
+            #print ("valor",value)
+            
+            #print ("estoy en el limite")
+            if value_red.all() != 0:
                 print ("ROJO")
-            if res_blue[cX][cY] != 0:
+            if value_blue.all() != 0:
                 print ("AZUL")
-            if res_yellow[cX][cY] != 0:
+            if value_yellow.all() != 0:
                 print ("AMARILLO")
-            """
+            
             #print ("prueba=",res[cX][cY])
             #print ("azul",res)
 
