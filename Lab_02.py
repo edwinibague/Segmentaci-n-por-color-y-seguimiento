@@ -5,7 +5,7 @@ from collections import deque
 from imutils.video import VideoStream
 
 #cap = cv2.VideoCapture(0)
-cap = cv2.VideoCapture("video_luz_natural.mp4")
+cap = cv2.VideoCapture(0)
 kernel = np.ones((5,5),np.uint8)
 
 
