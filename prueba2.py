@@ -4,9 +4,26 @@ import imutils
 from collections import deque
 from imutils.video import VideoStream
 
-#cap = cv2.VideoCapture(0)
+
+
+class kalma_filter:
+    def __init__(self):
+        self.kalman = cv2.KalmanFilter(4, 2)
+        self.kalman.measurementMatrix = np.array([[1, 0, 0, 0], [0, 1, 0, 0]], np.float32)
+        self.kalman.transitionMatrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]], np.float32)
+
+    def Estimate(self, x, y):
+
+        measured = np.array([[np.float32(x)], [np.float32(y)]])
+        self.kalman.correct(measured)
+        predict = self.kalman.predict()
+        return predict
+
+
+
+cap = cv2.VideoCapture(0)
 #cap = cv2.VideoCapture("video_luz_natural.mp4")
-cap = cv2.VideoCapture("video_luz_natural_2.mp4")
+#cap = cv2.VideoCapture("video_luz_natural_2.mp4")
 kernel = np.ones((5,5),np.uint8)
 
 # Buffer to draw tracking path
@@ -16,7 +33,8 @@ contador_rojo=0
 contador_azul=0
 contador_amarillo=0
 dim_x = cap.get(3)
-
+kalman = kalma_filter()
+predic = []
 while(1):
     #print("amarillos= ",contador_amarillo)
     #print("rojos= ",contador_rojo)
@@ -119,17 +137,22 @@ while(1):
             cX = 0
             cY = 0
 
+        predic = kalman.Estimate(cX, cY)
+        #predic.append((int(tp[0]),int(tp[1])))
         # put text and highlight the center
         cv2.circle(frame, (cX, cY), 5, (255, 255, 255), -1)
         cv2.putText(frame, "centroid", (cX - 25, cY - 25),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+        cv2.circle(frame, (predic[0], predic[1]), 5, (0, 255, 0), -1)
+        #cv2.putText(frame, "centroid", (predic[0] - 25, predic[1] - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         #print ("cX=",cX)
         
-        if cX <= limite-10:# and cX >= limite+10:
-            value_blue=res_blue[cX,cY]
-            value_red=res_red[cX,cY]
-            value_yellow=res_yellow[cX,cY]
+        if predic[0] <= limite-10:# and cX >= limite+10:
+            value_blue = res_blue[int(predic[0]), int(predic[1])]
+            value_red = res_red[int(predic[0]), int(predic[1])]
+            value_yellow = res_yellow[int(predic[0]), int(predic[1])]
             #print ("valor",value)
-            
+            """
             #print ("estoy en el limite")
             if value_red.all() != 0:
                 print ("ROJO")
@@ -137,7 +160,14 @@ while(1):
                 print ("AZUL")
             if value_yellow.all() != 0:
                 print ("AMARILLO")
-            
+            """
+
+
+            ad = cv2.bitwise_or(frame, frame, mask= mask_red)
+
+            if ad.all()!= 0:
+                print("si")
+
             #print ("prueba=",res[cX][cY])
             #print ("azul",res)
 
